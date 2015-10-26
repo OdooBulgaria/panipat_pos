@@ -1,0 +1,61 @@
+<openerp>
+	<data>
+        <record id="account_voucher.view_invoice_customer" model="ir.ui.view">
+            <field name="name">account.invoice.customer.pay</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr = "/form/sheet" position = "inside">
+                	<field name = "is_pos" invisible="1" />
+                	<field name = "picking_id" invisible = "1" />
+                </xpath>
+                <xpath expr="//button[@name='invoice_open'][last()]" position="after">
+                    <button name = "return_product" type = "object" string = "Return Products" 
+                    	attrs = "{'invisible':['|',('picking_id','=',False),('is_pos','=',False)]}" /> 
+                    <button name = "invoice_pay_customer" type = "object" string = "Register Payment and Transfer Products" context="{'pos':True}"
+                     attrs="{'invisible': ['|', ('state','!=','open'), ('is_pos','=',False)]}" class="oe_highlight" groups="base.group_user" />
+                    <button name="invoice_pay_customer" type="object" string="Register Payment"
+                        attrs="{'invisible': ['|',('state','!=','open'),('is_pos','=',True)]}" class="oe_highlight" groups="base.group_user"/>
+                </xpath>
+            </field>
+        </record>		
+		<record id = "action_pos_customer_invoice" model = "ir.actions.act_window">
+            <field name="name">POS Customer Invoices</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,calendar,graph</field>
+            <field eval="False" name="view_id"/>
+            <field name="domain">[('type','=','out_invoice'),('is_pos','=',True)]</field>
+            <field name="context">{'default_type':'out_invoice', 'type':'out_invoice', 'journal_type': 'sale','pos':True}</field>
+            <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a customer invoice.
+              </p><p>
+                Odoo's electronic invoicing allows to ease and fasten the
+                collection of customer payments. Your customer receives the
+                invoice by email and he can pay online and/or import it
+                in his own system.
+              </p><p>
+                The discussions with your customer are automatically displayed at
+                the bottom of each invoice.
+              </p>
+            </field>
+		</record>
+        <record id="action_invoice_tree1_view1_panipat" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="act_window_id" ref="action_pos_customer_invoice"/>
+        </record>
+
+        <record id="action_invoice_tree1_view2_panipat" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="account.invoice_form"/>
+            <field name="act_window_id" ref="action_pos_customer_invoice"/>
+        </record>
+
+        <menuitem action="action_pos_customer_invoice" id="menu_action_invoice_tree1_panipat" parent="account.menu_finance_receivables"/>		
+		
+	</data>
+</openerp>
